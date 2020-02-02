@@ -58,6 +58,7 @@
   <div class="file-box">
     <strong>Send a file</strong>
     <input type="file" id="put-file-select" />
+    <input type="button" value="Reload" id="reload-file-button" onclick="reload_file(); return false;" />
     <div id="put-file-list"></div>
     <input type="button" value="Send to device" id="put-file-button" onclick="put_file(); return false;" />
   </div>
@@ -84,6 +85,7 @@ var term;
 var ws;
 var connected = false;
 var binary_state = 0;
+var file = null;
 var put_file_name = null;
 var put_file_data = null;
 var get_file_name = null;
@@ -345,15 +347,20 @@ function handle_put_file_select(evt) {
     var files = evt.target.files;
 
     // Get the file info and load its data.
-    var f = files[0];
-    put_file_name = f.name;
+    file = files[0];
+    reload_file();
+}
+
+function reload_file() {
+    put_file_name = file.name;
     var reader = new FileReader();
     reader.onload = function(e) {
         put_file_data = new Uint8Array(e.target.result);
         document.getElementById('put-file-list').innerHTML = '' + escape(put_file_name) + ' - ' + put_file_data.length + ' bytes';
         document.getElementById('put-file-button').disabled = false;
+        document.getElementById('reload-file-button').disabled = false;
     };
-    reader.readAsArrayBuffer(f);
+    reader.readAsArrayBuffer(file);
 }
 
 document.getElementById('put-file-select').addEventListener('click', function(){
@@ -362,6 +369,7 @@ document.getElementById('put-file-select').addEventListener('click', function(){
 
 document.getElementById('put-file-select').addEventListener('change', handle_put_file_select, false);
 document.getElementById('put-file-button').disabled = true;
+document.getElementById('reload-file-button').disabled = true;
 
 </script>
 
